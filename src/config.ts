@@ -1,9 +1,14 @@
 import { Schema } from 'koishi'
+import { stringifyCompact, DEFAULT_KEYBOARD_ROWS } from './qq'
 
 export interface Config {
+  // --- 📝 指令名设置 ---
+  diceCommandName: string;
+  // --- 💬 消息设置 ---
   showRenderInfo: boolean;
   faceLabels: { angle: number; text: string }[];
   enableQuote: boolean;
+  // --- 🎨 渲染设置 ---
   showAxis: boolean;
   width: number;
   height: number;
@@ -11,9 +16,20 @@ export interface Config {
   diffuse: number;
   specular: number;
   shininess: number;
+  // --- 🤖 QQ 官方 Bot 平台设置 ---
+  enableQQMarkdown: boolean;
+  qqMarkdownKeyboardJson: string;
 }
 
 export const Config: Schema<Config> = Schema.intersect([
+  // --- 📝 指令名设置 ---
+  Schema.object({
+    diceCommandName: Schema.string()
+      .default('dice')
+      .description('🎲 dice 指令名称'),
+  }).description('📝 指令名设置'),
+
+  // --- 💬 消息设置 ---
   Schema.object({
     showRenderInfo: Schema.boolean()
       .default(true)
@@ -34,6 +50,8 @@ export const Config: Schema<Config> = Schema.intersect([
       .default(true)
       .description('💬↩️ 开启后，所有发送的消息都会引用回复触发指令的消息'),
   }).description('💬 消息设置'),
+
+  // --- 🎨 渲染设置 ---
   Schema.object({
     showAxis: Schema.boolean()
       .default(false)
@@ -72,4 +90,17 @@ export const Config: Schema<Config> = Schema.intersect([
         '<i>🔼 调大 → 光斑小而集中（像手电筒聚焦光束）</i><br>' +
         '<i>🔽 调小 → 光斑大而柔和（像柔光灯箱）</i>'),
   }).description('🎨 渲染设置'),
+
+  // --- 🤖 QQ 官方 Bot 平台设置 ---
+  Schema.object({
+    enableQQMarkdown: Schema.boolean()
+      .default(true)
+      .description('💬 在 QQ 官方 Bot 平台发送图片时附带 Markdown + 按钮消息'),
+    qqMarkdownKeyboardJson: Schema.string()
+      .role('textarea', { rows: [5, 10] })
+      .default(stringifyCompact(DEFAULT_KEYBOARD_ROWS))
+      .description(
+        '📋 QQ Markdown 按钮 JSON 配置<br><em>支持变量: <code>${diceCommandName}</code> <code>${userId}</code></em>',
+      ),
+  }).description('🤖 QQ 官方 Bot 平台设置'),
 ])
