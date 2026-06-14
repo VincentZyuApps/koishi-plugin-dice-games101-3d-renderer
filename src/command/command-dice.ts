@@ -13,8 +13,10 @@ export function registerDiceCommand(ctx: Context, config: Config) {
     .option('axis', '-a <show:boolean> 骰子本地坐标轴 ❤️X(+3/-4) 💚Y(+2/-5) 💙Z(+1/-6)，括号内为该轴正/负方向对应的点数（覆盖配置项）')
     .option('ambient', '--ka, --ambient <v:number> 环境光系数 k_a [0,1]（覆盖配置项）')
     .option('diffuse', '--kd, --diffuse <v:number> 漫反射系数 k_d [0,1]（覆盖配置项）')
+    .option('specular', '--ks, --specular <v:number> 镜面高光系数 k_s [0,4]（覆盖配置项）')
+    .option('shininess', '-p, --shininess <v:number> 高光锐度 p [1,512]（覆盖配置项）')
     .action(({ session, options }, yaw?: number, pitch?: number, roll?: number) => {
-      const W = 400, H = 400
+      const W = config.width, H = config.height
       const startTime = Date.now()
 
       // LCG 伪随机：x_{n+1} = (a·xₙ + c) mod 2³²，参数来自 Numerical Recipes
@@ -35,9 +37,11 @@ export function registerDiceCommand(ctx: Context, config: Config) {
 
       const ka = options.ambient ?? config.ambient
       const kd = options.diffuse ?? config.diffuse
+      const ks = options.specular ?? config.specular
+      const sh = options.shininess ?? config.shininess
       const r = new Rasterizer(W, H)
       r.setMVP(model, view, proj)
-      r.draw(buildDice(ka, kd))
+      r.draw(buildDice(ka, kd, ks, sh))
 
       // option 优先级高于 config（option 未传时为 undefined，?? 退回 config）
       if (options.axis ?? config.showAxis) r.drawAxes()
@@ -46,8 +50,11 @@ export function registerDiceCommand(ctx: Context, config: Config) {
       let msg = `${config.enableQuote ? h.quote(session.messageId) : ''}${h.image(encodePNG(W, H, r.frameBuffer), 'image/png')}`
       if (config.showRenderInfo) {
         const elapsed = Date.now() - startTime
-        const topFace = getFrontFace(model)  // 旋转后 Z 分量最大的面 = 最朝向镜头的面
-        msg += `\n🔄渲染时间: ${elapsed}ms | 🎯 YPR: ${yw}° ${pt}° ${rl}° | 🎲 最接近面向镜头面的点数: ${topFace}点`
+        const { face, dot } = getFrontFace(model)
+        const angleDeg = Math.acos(Math.min(1, dot)) * 180 / Math.PI
+        const label = config.faceLabels.find(e => angleDeg <= e.angle) ?? config.faceLabels.at(-1)
+        msg += `\n🔄渲染时间: ${elapsed}ms | 🎯 YPR: ${yw}° ${pt}° ${rl}° | 🎲 最接近面向镜头面的点数: ${face}点`
+        msg += `\n📐 正对程度: ${label?.text ?? ''}（偏转 ${Math.round(angleDeg)}°）`
       }
       return msg
     })

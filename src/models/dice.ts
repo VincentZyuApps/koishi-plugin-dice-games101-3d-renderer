@@ -31,8 +31,9 @@ function face(p0:Vec3,p1:Vec3,p2:Vec3,p3:Vec3, normal:Vec3, faceId:number, shade
  * 轴色对照（--axis）：❤️ +X=3/-X=4 | 💚 +Y=2/-Y=5 | 💙 +Z=1/-Z=6
  * 标准骰子对面之和为7（1对6，2对5，3对4）。
  */
-export function buildDice(ambient = 0.15, diffuse = 0.85): Triangle[] {
-  const shader = (ambient === 0.15 && diffuse === 0.85) ? diceShader : makeDiceShader(ambient, diffuse)
+export function buildDice(ambient = 0.15, diffuse = 0.85, specular = 0.6, shininess = 32): Triangle[] {
+  const shader = (ambient === 0.15 && diffuse === 0.85 && specular === 0.6 && shininess === 32)
+    ? diceShader : makeDiceShader(ambient, diffuse, specular, shininess)
   const f = (...args: Parameters<typeof face>) => face(...args)
   return [
     ...f(new Vec3(-.5,-.5,.5), new Vec3(.5,-.5,.5), new Vec3(.5,.5,.5), new Vec3(-.5,.5,.5), new Vec3(0,0,1), 1, shader),   // +Z = 1点
@@ -50,18 +51,18 @@ export function buildDice(ambient = 0.15, diffuse = 0.85): Triangle[] {
  *   rotated_n_z = d[8]·nx + d[9]·ny + d[10]·nz
  * 其中 d[8..10] 是行主序矩阵的第3行（世界空间 Z 轴方向）。
  */
-export function getFrontFace(model: Mat4): number {
+export function getFrontFace(model: Mat4): { face: number; dot: number } {
   const faces = [
     { nx: 0, ny: 0, nz: 1, value: 1 }, { nx: 0, ny: 0, nz: -1, value: 6 },
     { nx: 0, ny: 1, nz: 0, value: 2 }, { nx: 0, ny: -1, nz: 0, value: 5 },
     { nx: 1, ny: 0, nz: 0, value: 3 }, { nx: -1, ny: 0, nz: 0, value: 4 },
   ]
-  const d = model.d; let front = 1, maxZ = -Infinity
+  const d = model.d; let front = 1, dot = -Infinity
   for (const f of faces) {
     const tz = d[8] * f.nx + d[9] * f.ny + d[10] * f.nz
-    if (tz > maxZ) { maxZ = tz; front = f.value }
+    if (tz > dot) { dot = tz; front = f.value }
   }
-  return front
+  return { face: front, dot }
 }
 
 /**

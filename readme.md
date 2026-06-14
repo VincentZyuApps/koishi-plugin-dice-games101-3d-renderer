@@ -1,12 +1,21 @@
 # koishi-plugin-dice-games101-3d-renderer 🎲
 
-[![npm](https://img.shields.io/npm/v/koishi-plugin-games101-3d-renderer?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-games101-3d-renderer)
+[![npm](https://img.shields.io/npm/v/koishi-plugin-dice-games101-3d-renderer?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-dice-games101-3d-renderer)
+[![npm-download](https://img.shields.io/npm/dm/koishi-plugin-dice-games101-3d-renderer?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-dice-games101-3d-renderer)
+
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer)
+[![Gitee](https://img.shields.io/badge/Gitee-C71D23?style=for-the-badge&logo=gitee&logoColor=white)](https://gitee.com/vincent-zyu/koishi-plugin-dice-games101-3d-renderer)
+
+[![Koishi Forum](https://img.shields.io/badge/forum.koishi.xyz_topic_114514-5546A3?style=for-the-badge&logo=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Ff%2Ff3%2FKoishi.js_Logo.png&logoColor=white)](https://forum.koishi.xyz/t/topic/114514)
+[![QQ群](https://img.shields.io/badge/QQ群-1085190201-12B7F5?style=flat-square&logo=qq&logoColor=white)](https://qm.qq.com/q/4vjto4V7Di)
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 
 🎲 骰子：用TypeScript从零构建一个软件光栅化渲染器 🚀 
 
 > 整活+学习项目，灵感来自闫令琪老师的 GAMES101 课程作业
 
-> 没有 Three.js/WebGL，从矩阵乘法到PNG编码全部从头实现，零npm依赖
+> 没有 Three.js or WebGL等图形库，从矩阵乘法到PNG编码全部从头实现，零npm依赖
 
 ---
 
@@ -60,7 +69,7 @@ flowchart TD
           |   /
           |  /                  ← 看向原点 (0, 0, 0)
           | /
-          |/__________ +X
+          |/_______________ +X
          /
         +Z (相机背后)
 ```
@@ -327,7 +336,7 @@ if (zInterp < depthBuffer[x][y]) {
 
 ## 💡 片段着色：Lambert 漫反射
 
-**Lambert 光照模型**（漫反射 + 环境光）：
+**Lambert 光照模型**（[漫反射 + 环境光](https://en.wikipedia.org/wiki/Lambertian_reflectance)）：
 
 $$
 L = k_a I_a + k_d \max(0,\;\hat{n}\cdot\hat{l})\cdot I_d
@@ -349,7 +358,7 @@ const diff = Math.max(0, normal.dot(lightDir))
 const color = baseColor * (0.15 + diff * 0.85)
 ```
 
-### 扩展：完整 Blinn-Phong 模型（参考 C++ 实现）
+### 扩展：完整 [Blinn-Phong 模型](https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model)（参考 C++ 实现）
 
 本项目用简化 Lambert，完整的 Blinn-Phong 模型还包含**镜面高光**项，并引入**光源距离衰减**（平方反比定律）：
 
@@ -463,6 +472,13 @@ export function getTopFace(model: Mat4): number {
 |--------|------|------|
 | `showRenderInfo` | `true` | 显示渲染耗时、角度和顶面点数 |
 | `enableQuote` | `true` | 是否引用触发消息 |
+| `showAxis` | `false` | 渲染骰子本地坐标轴 |
+| `width` | `400` | 渲染图片宽度（像素，100-1000） |
+| `height` | `400` | 渲染图片高度（像素，100-1000） |
+| `ambient` | `0.15` | 环境光系数 k_a（Lambert） |
+| `diffuse` | `0.85` | 漫反射系数 k_d（Lambert） |
+| `specular` | `0.6` | 镜面高光系数 k_s（Blinn-Phong） |
+| `shininess` | `32` | 高光锐度 p（Blinn-Phong） |
 
 ---
 
@@ -470,13 +486,21 @@ export function getTopFace(model: Mat4): number {
 
 ```
 src/
-├── index.ts / config.ts          # 插件入口 & 配置
-├── command/command-dice.ts       # 指令解析（简单参数解析，略）
-├── models/dice.ts                # 骰子几何 + 顶面检测
-├── math/vec.ts & mat.ts          # Vec3/Vec4、Mat4（旋转、lookAt、透视、逆）
-├── renderer/rasterizer.ts        # 光栅化（AABB、边缘函数、Z-buffer、透视校正插值）
-│             shader.ts           # Lambert 着色 + UV 点数
-└── image/png.ts                  # 纯手写 PNG（IHDR/IDAT/IEND/zlib/CRC，略）
+├── index.ts            # 插件入口
+├── config.ts           # 配置定义
+├── usage.ts            # Koishi 控制台配置页面
+├── command/
+│   └── command-dice.ts # dice 指令（参数解析、管线编排）
+├── models/
+│   └── dice.ts         # 骰子几何 + 顶面 / 前向面检测
+├── math/
+│   ├── vec.ts          # Vec3 / Vec4 向量运算
+│   └── mat.ts          # Mat4 矩阵（旋转、lookAt、透视、逆、法线矩阵）
+├── view/
+│   ├── rasterizer.ts   # 软件光栅化器（MVP→AABB→重心坐标→Z-buffer→透视校正插值）
+│   └── shader.ts       # 片段着色器（Lambert + Blinn-Phong 光照 + UV 点数遮罩）
+└── image/
+    └── png.ts          # 纯手写 PNG 编码（IHDR/IDAT/IEND/zlib/CRC）
 ```
 
 ---

@@ -1,6 +1,7 @@
 import { Context } from 'koishi'
 import { Config } from './config'
 import { registerDiceCommand } from './command/command-dice'
+export { usage } from './usage';
 
 export const name = 'games101-3d-renderer'
 
