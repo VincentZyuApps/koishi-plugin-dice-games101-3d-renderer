@@ -1,0 +1,22 @@
+{
+  "name": "koishi-plugin-games101-3d-renderer",
+  "description": "整活+学习项目，灵感来自闫令琪老师的games101课程的作业",
+  "version": "0.0.1",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "dist"
+  ],
+  "license": "MIT",
+  "scripts": {},
+  "keywords": [
+    "chatbot",
+    "koishi",
+    "plugin"
+  ],
+  "devDependencies": {},
+  "peerDependencies": {
+    "koishi": "^4.18.7"
+  }
+}
