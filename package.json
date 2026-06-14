@@ -1,6 +1,6 @@
 {
-  "name": "koishi-plugin-games101-3d-renderer",
-  "description": "整活+学习项目，灵感来自闫令琪老师的games101课程的作业",
+  "name": "koishi-plugin-dice-games101-3d-renderer",
+  "description": "🎲 骰子：从零构建一个软件光栅化渲染器 🚀 | 整活+学习项目，灵感来自闫令琪老师的 GAMES101 课程作业 | 没有 Three.js/WebGL，从矩阵乘法到PNG编码全部从头实现，零npm依赖 | 支持自定义 yaw/pitch/roll 角度，自动计算顶面点数",
   "version": "0.0.1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
