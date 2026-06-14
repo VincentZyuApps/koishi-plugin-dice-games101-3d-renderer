@@ -2,7 +2,7 @@ import { Context, h } from 'koishi'
 import type { Config } from '../config'
 import { Vec3 } from '../math/vec'
 import { Mat4 } from '../math/mat'
-import { Rasterizer } from '../renderer/rasterizer'
+import { Rasterizer } from '../view/rasterizer'
 import { buildDice, getTopFace, getFrontFace } from '../models/dice'
 import { encodePNG } from '../image/png'
 

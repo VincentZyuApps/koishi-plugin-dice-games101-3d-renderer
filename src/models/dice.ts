@@ -1,7 +1,7 @@
 import { Vec3, Vec4 } from '../math/vec'
 import { Mat4 } from '../math/mat'
-import { Triangle } from '../renderer/shader'
-import { diceShader, makeDiceShader } from '../renderer/shader'
+import { Triangle } from '../view/shader'
+import { diceShader, makeDiceShader } from '../view/shader'
 
 /**
  * 将一个四边形面（两个三角形）加入三角形列表。

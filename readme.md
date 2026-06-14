@@ -135,6 +135,22 @@ $$
 
 旋转矩阵的列向量就是旋转后的坐标轴方向，且 $R^T=R^{-1}$（正交矩阵），这保证了旋转不改变向量长度。
 
+**2D 旋转推导**（以 $R_z$ 为例）：单位向量 $\mathbf{e}_1=(1,0)$, $\mathbf{e}_2=(0,1)$ 旋转 $\theta$ 后落在：
+
+$$
+\mathbf{e}_1' = (\cos\theta,\;\sin\theta),\qquad
+\mathbf{e}_2' = (-\sin\theta,\;\cos\theta)
+$$
+
+任意向量 $\mathbf{v}=x\mathbf{e}_1+y\mathbf{e}_2$ 旋转后展开：
+
+$$
+\mathbf{v}' = x\mathbf{e}_1'+y\mathbf{e}_2'
+= \begin{pmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{pmatrix}\begin{pmatrix}x\\y\end{pmatrix}
+$$
+
+这正是 $R_z$ 的左上 $2\times2$ 子块。$R_x$、$R_y$ 同理，只是"旋转所在平面"不同。
+
 ```ts
 const model = Mat4.rotateZ(rl).multiply(Mat4.rotateX(pt)).multiply(Mat4.rotateY(yw))
 ```
@@ -270,15 +286,29 @@ $$
 
 屏幕空间的 $(\alpha,\beta,\gamma)$ 是**经过透视失真**的，直接插值 UV 或法线会出错（近处拉伸）。
 
-**为什么要校正**：透视投影后线性插值的是 $1/z$，而不是 $z$ 本身——所以属性 $f$ 也要先除以 $z$ 再插值。
+**为什么要校正**：透视投影后，属性在屏幕空间的插值**不再线性**。根本原因是透视除法引入了非线性（$w$ 随深度变化），直接插值 UV 或法线会在近处被拉伸。
 
-设三顶点裁剪空间 $w$ 值为 $w_0,w_1,w_2$，属性值为 $f_0,f_1,f_2$：
+**证明 $f/w$ 在屏幕空间线性**：设三角形顶点在裁剪空间的坐标为 $P_i$，对应属性 $f_i$，裁剪空间 $w$ 值为 $w_i = -z_{\text{view},i} > 0$。
+
+3D 空间中 $f$ 是线性的，即 $f(\lambda) = \lambda_0 f_0 + \lambda_1 f_1 + \lambda_2 f_2$（$\lambda_i$ 为3D重心坐标）。
+
+透视投影后，屏幕重心坐标 $(\alpha,\beta,\gamma)$ 与 3D 坐标 $(\lambda_i)$ 的关系为（可由相似三角形推导）：
+
+$$
+\lambda_i = \frac{\alpha_i / w_i}{\alpha_0/w_0 + \alpha_1/w_1 + \alpha_2/w_2}
+$$
+
+代入 $f$ 的线性插值：
+
+$$
+f_P = \sum_i \lambda_i f_i = \frac{\sum_i \alpha_i \cdot f_i/w_i}{\sum_i \alpha_i/w_i}
+$$
+
+其中 $\sum_i \alpha_i/w_i$ 在屏幕空间线性（$1/w$ 可直接用 $\alpha,\beta,\gamma$ 插值），故分子和分母都可先线性插值，再相除：
 
 $$
 f_P=\frac{\alpha\,\dfrac{f_0}{w_0}+\beta\,\dfrac{f_1}{w_1}+\gamma\,\dfrac{f_2}{w_2}}{\alpha\,\dfrac{1}{w_0}+\beta\,\dfrac{1}{w_1}+\gamma\,\dfrac{1}{w_2}}
 $$
-
-**推导思路**：3D 空间中属性 $f$ 与深度 $z$ 成比例线性；投影后 $1/w$ 在屏幕空间线性；先屏幕插值 $f/w$ 和 $1/w$，再相除还原真实属性值。
 
 ### Z-buffer 深度测试
 
@@ -317,6 +347,45 @@ $\hat{n}\cdot\hat{l}$ 是入射角余弦——越正对光源越亮，背光面 
 const lightDir = new Vec3(1, 1, 1).normalized()
 const diff = Math.max(0, normal.dot(lightDir))
 const color = baseColor * (0.15 + diff * 0.85)
+```
+
+### 扩展：完整 Blinn-Phong 模型（参考 C++ 实现）
+
+本项目用简化 Lambert，完整的 Blinn-Phong 模型还包含**镜面高光**项，并引入**光源距离衰减**（平方反比定律）：
+
+$$
+L = L_a + \sum_{\text{lights}} \left(L_d + L_s\right)
+$$
+
+$$
+L_a = k_a \cdot I_a
+\qquad
+L_d = k_d \cdot \frac{I}{r^2} \cdot \max\!\left(0,\; \hat{n}\cdot\hat{l}\right)
+\qquad
+L_s = k_s \cdot \frac{I}{r^2} \cdot \max\!\left(0,\; \hat{n}\cdot\hat{h}\right)^p
+$$
+
+其中：
+- $r$ 为片段到光源的距离，$I/r^2$ 是**平方反比衰减**（物理准确）
+- $\hat{h} = \text{normalize}(\hat{l}+\hat{v})$ 为**半角向量**（Blinn 近似，$\hat{v}$ 为视线方向）
+- $p$ 为**高光指数**（shininess），越大高光越集中（本 C++ 实现取 $p=150$）
+- $k_s$ 为镜面反射系数
+
+**半角向量的几何意义**：$\hat{h}$ 是入射光 $\hat{l}$ 与视线 $\hat{v}$ 的角平分线。$\hat{n}\cdot\hat{h}$ 越大，说明法线越接近半角向量，即反射光越接近视线方向，高光越强。
+
+对比原始 Phong（用 $\hat{r}\cdot\hat{v}$ 代替 $\hat{n}\cdot\hat{h}$，$\hat{r}$ 为反射向量）：
+
+$$
+\hat{r} = 2(\hat{n}\cdot\hat{l})\hat{n} - \hat{l}
+$$
+
+Blinn-Phong 用半角向量替代反射向量，计算量更小且效果接近，是实时渲染的标准选择。
+
+```cpp
+// C++ 实现（cpp_renderer_fork_from_games101_pa03）
+Eigen::Vector3f half_dir = (light_dir + view_dir).normalized();      // 半角向量
+Eigen::Vector3f Ld = kd.cwiseProduct(I_r2) * max(0, n.dot(l_dir));   // 漫反射
+Eigen::Vector3f Ls = ks.cwiseProduct(I_r2) * pow(max(0, n.dot(h)), p); // 高光
 ```
 
 ### 法线变换矩阵：为什么用 $(M^{-1})^T$？
