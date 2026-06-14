@@ -1,18 +1,32 @@
+# 🏗️ 构建输出
 lib
 dist
 external
 
+# 📦 依赖
 node_modules
+
+# 🐍 Python 虚拟环境和cache
+**/venv/
+**/.venv/
+**/__pycache__/
+
+# 📝 日志
 npm-debug.log
 yarn-debug.log
 yarn-error.log
-tsconfig.tsbuildinfo
 
+# ⚙️ 构建缓存
+tsconfig.tsbuildinfo
 .eslintcache
-.DS_Store
+
+# 🖥️ 编辑器/IDE
 .idea
 .vscode
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+
+# 🍎 macOS
+.DS_Store

@@ -77,6 +77,8 @@ flowchart TD
 - **摄像头** 站在 `(0, 0, 3)`，看向 `(0, 0, 0)` → 视线是 **-Z**
 - **Up 方向** 是 **+Y**，**右侧** 是 **+X**
 
+![坐标系示意图](doc/images/01_coordinate_system.png)
+
 ---
 
 ## 🔢 齐次坐标：为什么要用 4D？
@@ -92,6 +94,8 @@ $$
 这样，**平移、旋转、缩放、投影**都统一成 4×4 矩阵乘法，管线中所有变换可以预乘合并为一个矩阵。
 
 > 规定：$w=1$ 表示点（位置），$w=0$ 表示向量（方向，不受平移影响）。
+
+![齐次坐标示意图](doc/images/02_homogeneous_coords.png)
 
 ---
 
@@ -120,11 +124,15 @@ const yw = yaw ?? lcg(seed) % 360
 
 > LCG（线性同余生成器）是最简单的伪随机数算法，公式 $x_{n+1}=(ax_n+c)\mod m$，这里 $a=1664525$，$c=1013904223$，$m=2^{32}$。
 
+![Yaw / Pitch / Roll 三轴旋转](doc/images/03_yaw_pitch_roll.png)
+
 ---
 
 ## 📐 数学：MVP 变换
 
 所有顶点依次经过三个变换：**Model → View → Projection**。
+
+![MVP 变换四阶段](doc/images/04_mvp_stages.png)
 
 ### Model 矩阵：三轴旋转
 
@@ -236,11 +244,13 @@ $$
 - $z=-n \Rightarrow z_\text{NDC}=-1$
 - $z=-f \Rightarrow z_\text{NDC}=+1$
 
-解得 $A=\frac{-(f+n)}{f-n}$，$B=\frac{-2fn}{f-n}$。
+解得 $A=-\dfrac{f+n}{f-n}$，$B=-\dfrac{2fn}{f-n}$。
 
 ```ts
 const proj = Mat4.perspective(45, 1, 0.1, 100)
 ```
+
+![透视投影视锥体](doc/images/05_perspective_projection.png)
 
 ---
 
@@ -249,16 +259,18 @@ const proj = Mat4.perspective(45, 1, 0.1, 100)
 **透视除法**：Clip 坐标 $(x_c,y_c,z_c,w_c)$ 除以 $w_c$ 得到 NDC（Normalized Device Coordinates）：
 
 $$
-\mathbf{p}_{\text{NDC}}=\left(\frac{x_c}{w_c},\;\frac{y_c}{w_c},\;\frac{z_c}{w_c}\right)\in[-1,1]^3
+\mathbf{p}_{\mathrm{NDC}}=\left(\frac{x_c}{w_c},\;\frac{y_c}{w_c},\;\frac{z_c}{w_c}\right)\in[-1,1]^3
 $$
 
-由投影矩阵最后一行，$w_c = -z_\text{view}$，即 $w_c > 0$（相机前方物体 $z_\text{view}<0$）。这一步实现了**近大远小**的视觉效果。
+由投影矩阵最后一行，$w_c = -z_{\rm view}$，即 $w_c > 0$（相机前方物体 $z_{\rm view}<0$）。这一步实现了**近大远小**的视觉效果。
 
 **视口变换**（NDC → 屏幕像素，Y 轴翻转因为屏幕 Y 轴向下）：
 
 $$
 x_s=\frac{x_{\text{NDC}}+1}{2}\cdot W,\qquad y_s=\frac{1-y_{\text{NDC}}}{2}\cdot H
 $$
+
+![透视除法与视口变换](doc/images/06_viewport_transform.png)
 
 ---
 
@@ -291,6 +303,8 @@ $$
 
 遍历策略：取包围盒（AABB）内所有像素，用边缘函数快速跳过外点，避免逐像素遍历全图。
 
+![光栅化：AABB 包围盒 + 重心坐标](doc/images/07_rasterization.png)
+
 ### 透视校正插值
 
 屏幕空间的 $(\alpha,\beta,\gamma)$ 是**经过透视失真**的，直接插值 UV 或法线会出错（近处拉伸）。
@@ -319,6 +333,8 @@ $$
 f_P=\frac{\alpha\,\dfrac{f_0}{w_0}+\beta\,\dfrac{f_1}{w_1}+\gamma\,\dfrac{f_2}{w_2}}{\alpha\,\dfrac{1}{w_0}+\beta\,\dfrac{1}{w_1}+\gamma\,\dfrac{1}{w_2}}
 $$
 
+![透视校正插值 vs 线性插值](doc/images/08_perspective_correction.png)
+
 ### Z-buffer 深度测试
 
 插值得到的深度 $z_P$ 与缓冲区比较，通过则写入，否则丢弃（靠近相机的片段胜出）：
@@ -332,6 +348,8 @@ if (zInterp < depthBuffer[x][y]) {
 }
 ```
 
+![Z-buffer 深度测试](doc/images/09_zbuffer.png)
+
 ---
 
 ## 💡 片段着色：Lambert 漫反射
@@ -344,8 +362,8 @@ $$
 
 | 符号 | 含义 |
 |------|------|
-| $k_a$ | 环境光系数（本项目取 0.15） |
-| $k_d$ | 漫反射系数（本项目取 0.85） |
+| $k_a$ | 环境光系数（本项目默认值取 0.15） |
+| $k_d$ | 漫反射系数（本项目默认值取 0.85） |
 | $\hat{n}$ | 片段法线（须经法线矩阵变换，见下） |
 | $\hat{l}$ | 指向光源的单位向量（`(1,1,1)` 归一化） |
 | $I_a, I_d$ | 环境光/漫反射光强度 |
@@ -358,7 +376,9 @@ const diff = Math.max(0, normal.dot(lightDir))
 const color = baseColor * (0.15 + diff * 0.85)
 ```
 
-### 扩展：完整 [Blinn-Phong 模型](https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model)（参考 C++ 实现）
+![Lambert 漫反射光照模型](doc/images/10_lambert_lighting.png)
+
+### 扩展：完整 [Blinn-Phong 模型](https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model)
 
 本项目用简化 Lambert，完整的 Blinn-Phong 模型还包含**镜面高光**项，并引入**光源距离衰减**（平方反比定律）：
 
@@ -377,7 +397,7 @@ $$
 其中：
 - $r$ 为片段到光源的距离，$I/r^2$ 是**平方反比衰减**（物理准确）
 - $\hat{h} = \text{normalize}(\hat{l}+\hat{v})$ 为**半角向量**（Blinn 近似，$\hat{v}$ 为视线方向）
-- $p$ 为**高光指数**（shininess），越大高光越集中（本 C++ 实现取 $p=150$）
+- $p$ 为**高光指数**（shininess），越大高光越集中
 - $k_s$ 为镜面反射系数
 
 **半角向量的几何意义**：$\hat{h}$ 是入射光 $\hat{l}$ 与视线 $\hat{v}$ 的角平分线。$\hat{n}\cdot\hat{h}$ 越大，说明法线越接近半角向量，即反射光越接近视线方向，高光越强。
@@ -391,11 +411,13 @@ $$
 Blinn-Phong 用半角向量替代反射向量，计算量更小且效果接近，是实时渲染的标准选择。
 
 ```cpp
-// C++ 实现（cpp_renderer_fork_from_games101_pa03）
+// cpp 的 Eigen 线性代数库
 Eigen::Vector3f half_dir = (light_dir + view_dir).normalized();      // 半角向量
 Eigen::Vector3f Ld = kd.cwiseProduct(I_r2) * max(0, n.dot(l_dir));   // 漫反射
 Eigen::Vector3f Ls = ks.cwiseProduct(I_r2) * pow(max(0, n.dot(h)), p); // 高光
 ```
+
+![完整 Blinn-Phong 模型](doc/images/11_blinn_phong.png)
 
 ### 法线变换矩阵：为什么用 $(M^{-1})^T$？
 
@@ -411,6 +433,8 @@ $$
 
 对纯旋转矩阵 $M=R$，由 $R^{-1}=R^T$ 可得 $G=R$，退化为直接用 $M$。本项目骰子只做旋转无缩放，所以法线可以直接经过 Model 矩阵旋转部分变换。
 
+![法线变换矩阵 (M⁻¹)ᵀ](doc/images/12_normal_matrix.png)
+
 ### 点数判断（UV 圆形测试）
 
 每个顶点携带 UV 坐标 $(u,v)\in[0,1]^2$，经透视校正插值后与预设圆心 $(c_x,c_y)$ 比较：
@@ -422,6 +446,8 @@ $$
 ```ts
 const isDot = (uv.x - dotCenter.x) ** 2 + (uv.y - dotCenter.y) ** 2 < 0.09 ** 2
 ```
+
+![骰子六面点数 UV 布局](doc/images/13_uv_dots.png)
 
 ---
 
@@ -463,6 +489,8 @@ export function getTopFace(model: Mat4): number {
   return top
 }
 ```
+
+![顶面判断算法](doc/images/14_top_face.png)
 
 ---
 
