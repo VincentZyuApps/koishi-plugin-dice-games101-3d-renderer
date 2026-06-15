@@ -1,6 +1,6 @@
 {
   "name": "koishi-plugin-dice-games101-3d-renderer",
-  "description": "🎲 骰子，学习图形学！：用TypeScript从零构建一个软件光栅化渲染器 🚀 | 整活+学习项目，灵感来自闫令琪老师的 GAMES101 课程作业 | 没有 Three.js/WebGL，从矩阵乘法到PNG编码全部从头实现，零npm依赖",
+  "description": "🎲 骰子，学习图形学！整活插件：用TypeScript从零构建一个软件光栅化渲染器 🚀 | 整活+学习项目，灵感来自闫令琪老师的 GAMES101 课程作业 | 没有 Three.js/WebGL，从矩阵乘法到PNG编码全部从头实现，零npm依赖",
   "version": "0.2.2-beta.4+20260615",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",

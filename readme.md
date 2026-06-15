@@ -37,6 +37,73 @@ dice -a --kd 0.5 --ks 0     # 坐标轴 + 纯 Lambert 漫反射（无高光）
 
 ---
 
+## 📸 预览
+
+### dice 指令效果
+![dice 渲染效果](doc/images/preview/preview.dice.png)
+
+### OneBot 平台 / 普通消息模式
+![OneBot 平台](doc/images/preview/preview.command.dice.onebot.platform.png)
+
+### QQ 官方平台 / Markdown + LaTeX 模式
+![QQ 官方 Markdown](doc/images/preview/preview.command.dice.onebot.qq.platform.markdown.latex.png)
+
+---
+
+## 🛠️ 配置
+
+| 配置项 | 默认 | 说明 |
+|--------|------|------|
+| `showRenderInfo` | `true` | 显示渲染耗时、角度和顶面点数 |
+| `enableQuote` | `true` | 是否引用触发消息 |
+| `showAxis` | `false` | 渲染骰子本地坐标轴 |
+| `width` | `400` | 渲染图片宽度（像素，100-1000） |
+| `height` | `400` | 渲染图片高度（像素，100-1000） |
+| `ambient` | `0.15` | 环境光系数 k_a（Lambert） |
+| `diffuse` | `0.85` | 漫反射系数 k_d（Lambert） |
+| `specular` | `0.6` | 镜面高光系数 k_s（Blinn-Phong） |
+| `shininess` | `32` | 高光锐度 p（Blinn-Phong） |
+| `enableQQMarkdown` | `true` | 在 QQ 官方 Bot 平台发送图片时附带 Markdown + 按钮消息 |
+| `diceMarkdownSteps` | `['1-rotation-matrices', '6-normal-matrix', '7-face-detection']` | 📐 QQ Markdown 展示的 LaTeX 计算步骤（复选框） |
+
+---
+
+## 📁 项目结构
+
+```
+src/
+├── index.ts            # 插件入口
+├── config.ts           # 配置定义
+├── usage.ts            # Koishi 控制台配置页面
+├── qq.ts               # QQ Markdown + 键盘消息发送
+├── command/
+│   └── command-dice.ts # dice 指令（参数解析、管线编排）
+├── markdown/
+│   ├── types.ts        # MarkdownContext 类型 + StepKey
+│   ├── md.ts           # buildDiceMarkdown 主入口
+│   ├── all-steps.ts    # 10 步注册表 + 排序
+│   ├── step0.ts ~ step9.ts  # [0]🔄角度转换 ~ [9]✨Blinn-Phong
+├── models/
+│   └── dice.ts         # 骰子几何 + 顶面 / 前向面检测
+├── math/
+│   ├── vec.ts          # Vec3 / Vec4 向量运算
+│   └── mat.ts          # Mat4 矩阵（旋转、lookAt、透视、逆、法线矩阵）
+├── view/
+│   ├── rasterizer.ts   # 软件光栅化器（MVP→AABB→重心坐标→Z-buffer→透视校正插值）
+│   └── shader.ts       # 片段着色器（Lambert + Blinn-Phong 光照 + UV 点数遮罩）
+└── image/
+    └── png.ts          # 纯手写 PNG 编码（IHDR/IDAT/IEND/zlib/CRC）
+```
+
+---
+
+## 📦 依赖
+
+零图形库依赖。唯一外部依赖：Node.js 内置 `zlib`（PNG 压缩）+ Koishi 本体。
+
+---
+---
+
 ## 🗺️ 渲染管线总览
 
 ```mermaid
@@ -500,58 +567,6 @@ export function getTopFace(model: Mat4): number {
 ![顶面判断算法](doc/images/14_top_face.png)
 
 ---
-
-## 🛠️ 配置
-
-| 配置项 | 默认 | 说明 |
-|--------|------|------|
-| `showRenderInfo` | `true` | 显示渲染耗时、角度和顶面点数 |
-| `enableQuote` | `true` | 是否引用触发消息 |
-| `showAxis` | `false` | 渲染骰子本地坐标轴 |
-| `width` | `400` | 渲染图片宽度（像素，100-1000） |
-| `height` | `400` | 渲染图片高度（像素，100-1000） |
-| `ambient` | `0.15` | 环境光系数 k_a（Lambert） |
-| `diffuse` | `0.85` | 漫反射系数 k_d（Lambert） |
-| `specular` | `0.6` | 镜面高光系数 k_s（Blinn-Phong） |
-| `shininess` | `32` | 高光锐度 p（Blinn-Phong） |
-| `enableQQMarkdown` | `true` | 在 QQ 官方 Bot 平台发送图片时附带 Markdown + 按钮消息 |
-| `diceMarkdownSteps` | `['1-rotation-matrices', '6-normal-matrix', '7-face-detection']` | 📐 QQ Markdown 展示的 LaTeX 计算步骤（复选框） |
-
----
-
-## 📁 项目结构
-
-```
-src/
-├── index.ts            # 插件入口
-├── config.ts           # 配置定义
-├── usage.ts            # Koishi 控制台配置页面
-├── qq.ts               # QQ Markdown + 键盘消息发送
-├── command/
-│   └── command-dice.ts # dice 指令（参数解析、管线编排）
-├── markdown/
-│   ├── types.ts        # MarkdownContext 类型 + StepKey
-│   ├── md.ts           # buildDiceMarkdown 主入口
-│   ├── all-steps.ts    # 10 步注册表 + 排序
-│   ├── step0.ts ~ step9.ts  # [0]🔄角度转换 ~ [9]✨Blinn-Phong
-├── models/
-│   └── dice.ts         # 骰子几何 + 顶面 / 前向面检测
-├── math/
-│   ├── vec.ts          # Vec3 / Vec4 向量运算
-│   └── mat.ts          # Mat4 矩阵（旋转、lookAt、透视、逆、法线矩阵）
-├── view/
-│   ├── rasterizer.ts   # 软件光栅化器（MVP→AABB→重心坐标→Z-buffer→透视校正插值）
-│   └── shader.ts       # 片段着色器（Lambert + Blinn-Phong 光照 + UV 点数遮罩）
-└── image/
-    └── png.ts          # 纯手写 PNG 编码（IHDR/IDAT/IEND/zlib/CRC）
-```
-
----
-
-## 📦 依赖
-
-零图形库依赖。唯一外部依赖：Node.js 内置 `zlib`（PNG 压缩）+ Koishi 本体。
-
 ---
 
 ## 📚 参考
