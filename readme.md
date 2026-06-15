@@ -11,7 +11,7 @@
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 
-🎲 骰子：用TypeScript从零构建一个软件光栅化渲染器 🚀 
+🎲 骰子，学习图形学!：用TypeScript从零构建一个软件光栅化渲染器 🚀 
 
 > 整活+学习项目，灵感来自闫令琪老师的 GAMES101 课程作业
 
@@ -22,8 +22,15 @@
 ## 🎮 快速上手
 
 ```
-dice                    # 随机角度摇一次骰子
-dice 30 20 10           # 指定偏航 30°、俯仰 20°、翻滚 10°
+dice                        # 随机角度摇一次骰子
+dice 30 20 10               # 指定 Yaw=30° Pitch=20° Roll=10°
+dice --axis                 # 显示骰子本地坐标轴
+dice 45 0 0 --axis          # 正Yaw 45° + 坐标轴可视化
+dice 0 90 0                 # 俯仰 90°（"鸟瞰"骰子顶部）
+dice 67 67 67               # 🗿 神秘的 67° * 3
+dice --ka 0.05 --kd 0.95    # 低环境光 + 强漫反射（高对比度）
+dice --ks 2.0 -p 128        # 镜面高光 × 2 + 高锐度（闪亮效果）
+dice -a --kd 0.5 --ks 0     # 坐标轴 + 纯 Lambert 漫反射（无高光）
 ```
 
 敲回车后插件会实时渲染一个 400×400 的 3D 骰子图片发回来，同时告诉你渲染耗时和哪面朝上。
@@ -227,15 +234,15 @@ $X/Y$ 方向直接除以 $r/t$ 归一化；$Z$ 方向需要保留深度排序关
 
 $$
 P=\begin{pmatrix}
-\dfrac{n}{r} & 0 & 0 & 0\\[6pt]
-0 & \dfrac{n}{t} & 0 & 0\\[6pt]
-0 & 0 & \dfrac{-(f+n)}{f-n} & \dfrac{-2fn}{f-n}\\[6pt]
+\dfrac{n}{r} & 0 & 0 & 0\\
+0 & \dfrac{n}{t} & 0 & 0\\
+0 & 0 & \dfrac{-(f+n)}{f-n} & \dfrac{-2fn}{f-n}\\
 0 & 0 & -1 & 0
 \end{pmatrix}
 =\begin{pmatrix}
-\dfrac{1}{a\cdot\tan(\text{fov}/2)} & 0 & 0 & 0\\[6pt]
-0 & \dfrac{1}{\tan(\text{fov}/2)} & 0 & 0\\[6pt]
-0 & 0 & \dfrac{-(f+n)}{f-n} & \dfrac{-2fn}{f-n}\\[6pt]
+\dfrac{1}{a\cdot\tan(\text{fov}/2)} & 0 & 0 & 0\\
+0 & \dfrac{1}{\tan(\text{fov}/2)} & 0 & 0\\
+0 & 0 & \dfrac{-(f+n)}{f-n} & \dfrac{-2fn}{f-n}\\
 0 & 0 & -1 & 0
 \end{pmatrix}
 $$
@@ -507,6 +514,8 @@ export function getTopFace(model: Mat4): number {
 | `diffuse` | `0.85` | 漫反射系数 k_d（Lambert） |
 | `specular` | `0.6` | 镜面高光系数 k_s（Blinn-Phong） |
 | `shininess` | `32` | 高光锐度 p（Blinn-Phong） |
+| `enableQQMarkdown` | `true` | 在 QQ 官方 Bot 平台发送图片时附带 Markdown + 按钮消息 |
+| `diceMarkdownSteps` | `['1-rotation-matrices', '6-normal-matrix', '7-face-detection']` | 📐 QQ Markdown 展示的 LaTeX 计算步骤（复选框） |
 
 ---
 
@@ -517,8 +526,14 @@ src/
 ├── index.ts            # 插件入口
 ├── config.ts           # 配置定义
 ├── usage.ts            # Koishi 控制台配置页面
+├── qq.ts               # QQ Markdown + 键盘消息发送
 ├── command/
 │   └── command-dice.ts # dice 指令（参数解析、管线编排）
+├── markdown/
+│   ├── types.ts        # MarkdownContext 类型 + StepKey
+│   ├── md.ts           # buildDiceMarkdown 主入口
+│   ├── all-steps.ts    # 10 步注册表 + 排序
+│   ├── step0.ts ~ step9.ts  # [0]🔄角度转换 ~ [9]✨Blinn-Phong
 ├── models/
 │   └── dice.ts         # 骰子几何 + 顶面 / 前向面检测
 ├── math/

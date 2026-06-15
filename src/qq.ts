@@ -1,4 +1,6 @@
-import { h } from 'koishi';
+import { h } from 'koishi'
+import { buildDiceMarkdown } from './markdown/md'
+import type { MarkdownContext, StepKey } from './markdown/types';
 
 export const DEFAULT_KEYBOARD_ROWS = {
   rows: [
@@ -47,26 +49,11 @@ export function buildDiceKeyboard(
   return DEFAULT_KEYBOARD_ROWS;
 }
 
-export interface DiceRenderInfo {
-  elapsed: number;
-  yaw: number;
-  pitch: number;
-  roll: number;
-  face: number;
-  angleDeg: number;
-  label?: string;
+export interface DiceRenderInfo extends MarkdownContext {
+  label?: string
 }
 
-export function buildDiceMarkdown(info: DiceRenderInfo): string {
-  return [
-    '# 🎲 骰子渲染结果',
-    '',
-    `> 好玩不awa`,
-    '',
-    '---',
-    '',
-  ].join('\n');
-}
+export { buildDiceMarkdown } from './markdown/md'
 
 export async function sendQQMarkdown(
   session: any,
@@ -114,9 +101,10 @@ export async function sendQQMarkdown(
 export async function replyWithDiceMarkdownKeyboard(
   session: any,
   config: {
-    enableQQMarkdown: boolean;
-    qqMarkdownKeyboardJson: string;
-    diceCommandName: string;
+    enableQQMarkdown: boolean
+    qqMarkdownKeyboardJson: string
+    diceCommandName: string
+    diceMarkdownSteps: StepKey[]
   },
   info: DiceRenderInfo,
 ): Promise<void> {
@@ -124,10 +112,10 @@ export async function replyWithDiceMarkdownKeyboard(
     !config.enableQQMarkdown ||
     !['qq', 'qqguild'].includes(session.platform)
   ) {
-    return;
+    return
   }
 
-  const md = buildDiceMarkdown(info);
+  const md = buildDiceMarkdown(info, config.diceMarkdownSteps, info.label)
   const kb = buildDiceKeyboard(
     { diceCommandName: config.diceCommandName },
     session.userId,

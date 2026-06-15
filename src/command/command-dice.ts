@@ -6,6 +6,7 @@ import { Rasterizer } from '../view/rasterizer'
 import { buildDice, getTopFace, getFrontFace } from '../models/dice'
 import { encodePNG } from '../image/png'
 import { replyWithDiceMarkdownKeyboard } from '../qq'
+import { STEP_KEYS } from '../markdown/all-steps'
 
 export function registerDiceCommand(ctx: Context, config: Config) {
   ctx.command(config.diceCommandName + ' [yaw:number] [pitch:number] [roll:number]', '渲染一个3D骰子')
@@ -16,7 +17,8 @@ export function registerDiceCommand(ctx: Context, config: Config) {
     .option('diffuse', '--kd, --diffuse <v:number> 漫反射系数 k_d [0,1]（覆盖配置项）')
     .option('specular', '--ks, --specular <v:number> 镜面高光系数 k_s [0,4]（覆盖配置项）')
     .option('shininess', '-p, --shininess <v:number> 高光锐度 p [1,512]（覆盖配置项）')
-    .action(({ session, options }, yaw?: string, pitch?: string, roll?: string) => {
+    .option('mdSteps', '--md-steps <steps:string> 📐 覆盖 QQ Markdown 展示的计算步骤（数字逗号分隔，如 0,1,5）')
+    .action(async ({ session, options }, yaw?: string, pitch?: string, roll?: string) => {
       const W = config.width, H = config.height
       const startTime = Date.now()
 
@@ -56,20 +58,32 @@ export function registerDiceCommand(ctx: Context, config: Config) {
         face = ff.face
         angleDeg = Math.acos(Math.min(1, ff.dot)) * 180 / Math.PI
         const label = config.faceLabels.find(e => angleDeg <= e.angle) ?? config.faceLabels.at(-1)
-        msg += `\n🔄渲染时间: ${elapsed}ms | 🎯 YPR: ${yw}° ${pt}° ${rl}° | 🎲 最接近面向镜头面的点数: ${face}点`
+        msg += `\n⏱️ 渲染耗时: ${elapsed}ms`
+        msg += `\n🎯 偏航Yaw / 俯仰Pitch / 翻滚Roll: ${yw}° / ${pt}° / ${rl}°`
+        msg += `\n🎲 最面向镜头面: ${face}点`
         msg += `\n📐 正对程度: ${label?.text ?? ''}（偏转 ${Math.round(angleDeg)}°）`
       }
+      await session.send(msg)
       if (config.enableQQMarkdown) {
+        let steps = options.mdSteps
+          ? options.mdSteps.split(',')
+              .map((s: string) => parseInt(s.trim()))
+              .filter((i: number) => i >= 0 && i < STEP_KEYS.length)
+              .map((i: number) => STEP_KEYS[i])
+          : config.diceMarkdownSteps
+        if (steps.length === 0) steps = config.diceMarkdownSteps
         const ff = getFrontFace(model)
         const ad = Math.acos(Math.min(1, ff.dot)) * 180 / Math.PI
         const lb = config.faceLabels.find(e => ad <= e.angle) ?? config.faceLabels.at(-1)
-        replyWithDiceMarkdownKeyboard(session, config, {
+        await replyWithDiceMarkdownKeyboard(session, { ...config, diceMarkdownSteps: steps }, {
           elapsed: Date.now() - startTime,
           yaw: yw, pitch: pt, roll: rl,
           face: ff.face, angleDeg: ad,
           label: lb?.text ?? '',
-        }).catch(() => {})
+          ambient: ka, diffuse: kd, specular: ks, shininess: sh,
+          width: W, height: H,
+          fov: 45, near: 0.1, far: 100,
+        })
       }
-      return msg
     })
 }
