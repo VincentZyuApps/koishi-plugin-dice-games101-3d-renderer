@@ -1,24 +1,26 @@
 import { Schema } from 'koishi'
 import { stringifyCompact, DEFAULT_KEYBOARD_ROWS } from './qq'
+import type { StepKey } from './markdown/types'
 
 export interface Config {
   // --- 📝 指令名设置 ---
-  diceCommandName: string;
+  diceCommandName: string
   // --- 💬 消息设置 ---
-  showRenderInfo: boolean;
-  faceLabels: { angle: number; text: string }[];
-  enableQuote: boolean;
+  showRenderInfo: boolean
+  faceLabels: { angle: number; text: string }[]
+  enableQuote: boolean
   // --- 🎨 渲染设置 ---
-  showAxis: boolean;
-  width: number;
-  height: number;
-  ambient: number;
-  diffuse: number;
-  specular: number;
-  shininess: number;
+  showAxis: boolean
+  width: number
+  height: number
+  ambient: number
+  diffuse: number
+  specular: number
+  shininess: number
   // --- 🤖 QQ 官方 Bot 平台设置 ---
-  enableQQMarkdown: boolean;
-  qqMarkdownKeyboardJson: string;
+  enableQQMarkdown: boolean
+  diceMarkdownSteps: StepKey[]
+  qqMarkdownKeyboardJson: string
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -35,8 +37,8 @@ export const Config: Schema<Config> = Schema.intersect([
       .default(true)
       .description('📊⏱️🎲 在骰子图片后显示一些渲染信息 <br> line1: 渲染耗时、角度信息、以及最接近面向镜头面的点数 <br> line2: 对于正对镜头程度的评价'),
     faceLabels: Schema.array(Schema.object({
-      angle: Schema.number().required().description('角度上限（°）'),
-      text: Schema.string().required().description('评价文案'),
+      angle: Schema.number().description('角度上限（°）'),
+      text: Schema.string().description('评价文案'),
     })).role('table')
       .default([
         { angle: 10, text: '非常正对！' },
@@ -54,7 +56,7 @@ export const Config: Schema<Config> = Schema.intersect([
   // --- 🎨 渲染设置 ---
   Schema.object({
     showAxis: Schema.boolean()
-      .default(false)
+      .default(true)
       .description('📐🧭 渲染骰子本地坐标轴（随骰子旋转）<br>' +
         '<i>❤️ X 轴：正向 (+X) → 3 点面，负向 (-X) → 4 点面</i><br>' +
         '<i>💚 Y 轴：正向 (+Y) → 2 点面，负向 (-Y) → 5 点面</i><br>' +
@@ -96,6 +98,27 @@ export const Config: Schema<Config> = Schema.intersect([
     enableQQMarkdown: Schema.boolean()
       .default(true)
       .description('💬 在 QQ 官方 Bot 平台发送图片时附带 Markdown + 按钮消息'),
+    diceMarkdownSteps: Schema.array(
+      Schema.union([
+        Schema.const('0-ypr-to-rad' as StepKey).description('[0] 🔄 角度转弧度'),
+        Schema.const('1-rotation-matrices' as StepKey).description('[1] 🔀 旋转矩阵'),
+        Schema.const('2-model-matrix' as StepKey).description('[2] 🧱 Model 合成'),
+        Schema.const('3-view-matrix' as StepKey).description('[3] 📷 View 变换'),
+        Schema.const('4-perspective' as StepKey).description('[4] 🔭 透视投影'),
+        Schema.const('5-mvp-transform' as StepKey).description('[5] 📐 MVP 变换'),
+        Schema.const('6-normal-matrix' as StepKey).description('[6] 📏 法线矩阵'),
+        Schema.const('7-face-detection' as StepKey).description('[7] 🎯 正面检测'),
+        Schema.const('8-lambert' as StepKey).description('[8] 💡 Lambert 漫反射'),
+        Schema.const('9-blinn-phong' as StepKey).description('[9] ✨ Blinn-Phong 高光'),
+      ])
+    )
+      .default([
+        '1-rotation-matrices',
+        '6-normal-matrix',
+        '7-face-detection',
+      ])
+      .role('checkbox')
+      .description('📐 骰子 Markdown 中展示的 LaTeX 计算步骤（可多选）'),
     qqMarkdownKeyboardJson: Schema.string()
       .role('textarea', { rows: [5, 10] })
       .default(stringifyCompact(DEFAULT_KEYBOARD_ROWS))

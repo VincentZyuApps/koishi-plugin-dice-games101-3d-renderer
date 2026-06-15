@@ -1,0 +1,40 @@
+import type { MarkdownContext, StepKey } from './types'
+import { STEPS, sortByDefinedOrder } from './all-steps'
+
+export function buildDiceMarkdown(
+  ctx: MarkdownContext,
+  enabledSteps: StepKey[],
+  label?: string,
+): string {
+  const parts: string[] = [
+    '# 🎲 骰子渲染结果 ✨',
+    '',
+    '> 🎮 好玩不awa 🎉',
+    '',
+    '---',
+    '',
+    '> ⚠️ 电脑QQ暂不支持渲染LaTeX，请去手机QQ查看',
+  ]
+
+  const sorted = sortByDefinedOrder(enabledSteps)
+  for (const key of sorted) {
+    const step = STEPS[key]
+    if (!step) continue
+    parts.push('')
+    parts.push(step.render(ctx))
+  }
+
+  parts.push('')
+  parts.push('---')
+  parts.push('')
+  parts.push(`| 参数 | 值 |`)
+  parts.push(`|---|---|`)
+    parts.push(`| 🎯 YPR | ${ctx.yaw}° / ${ctx.pitch}° / ${ctx.roll}° |`)
+  parts.push(`| 🎲 正面 | ${ctx.face}点 (偏转 ${ctx.angleDeg.toFixed(1)}°) |`)
+  parts.push(`| ⏱️ 耗时 | ${ctx.elapsed}ms |`)
+  if (label) {
+    parts.push(`| 📐 评价 | ${label} |`)
+  }
+
+  return parts.join('\n')
+}
