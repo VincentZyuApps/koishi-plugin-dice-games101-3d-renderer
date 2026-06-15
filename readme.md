@@ -11,7 +11,7 @@
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 
-🎲 骰子，学习图形学!：用TypeScript从零构建一个软件光栅化渲染器 🚀 
+🎲 骰子，学习图形学!整活插件：用TypeScript从零构建一个软件光栅化渲染器 🚀 
 
 > 整活+学习项目，灵感来自闫令琪老师的 GAMES101 课程作业
 
