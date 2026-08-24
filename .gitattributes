@@ -7,8 +7,8 @@
 *.webp -text
 
 # Include documentation and illustration scripts in GitHub Linguist statistics.
-*.py linguist-detectable -linguist-documentation -linguist-generated
-*.md linguist-detectable -linguist-documentation
-*.MD linguist-detectable -linguist-documentation
-*.markdown linguist-detectable -linguist-documentation
-*.MARKDOWN linguist-detectable -linguist-documentation
+*.py linguist-language=Python linguist-detectable -linguist-documentation -linguist-generated
+*.md linguist-language=Markdown linguist-detectable -linguist-documentation -linguist-generated
+*.MD linguist-language=Markdown linguist-detectable -linguist-documentation -linguist-generated
+*.markdown linguist-language=Markdown linguist-detectable -linguist-documentation -linguist-generated
+*.MARKDOWN linguist-language=Markdown linguist-detectable -linguist-documentation -linguist-generated
