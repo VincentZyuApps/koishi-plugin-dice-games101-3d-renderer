@@ -8,7 +8,7 @@ export const usage = `
   <a href="https://www.npmjs.com/package/koishi-plugin-dice-games101-3d-renderer" target="_blank">
     <img src="https://img.shields.io/npm/v/koishi-plugin-dice-games101-3d-renderer?style=flat-square" alt="npm version">
   </a>
-  <a href="https://www.npmjs.com/package/koishi-plugin-dice-games101-3d-renderer" target="_blank">
+  <a href="https://npm-stat.com/charts.html?package=koishi-plugin-dice-games101-3d-renderer" target="_blank">
     <img src="https://img.shields.io/npm/dm/koishi-plugin-dice-games101-3d-renderer?style=flat-square" alt="npm downloads">
   </a>
   <a href="https://github.com/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer" target="_blank">

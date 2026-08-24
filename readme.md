@@ -1,7 +1,7 @@
 # koishi-plugin-dice-games101-3d-renderer 🎲
 
 [![npm](https://img.shields.io/npm/v/koishi-plugin-dice-games101-3d-renderer?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-dice-games101-3d-renderer)
-[![npm-download](https://img.shields.io/npm/dm/koishi-plugin-dice-games101-3d-renderer?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-dice-games101-3d-renderer)
+[![npm-download](https://img.shields.io/npm/dm/koishi-plugin-dice-games101-3d-renderer?style=flat-square)](https://npm-stat.com/charts.html?package=koishi-plugin-dice-games101-3d-renderer)
 
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer)
 [![Gitee](https://img.shields.io/badge/Gitee-C71D23?style=for-the-badge&logo=gitee&logoColor=white)](https://gitee.com/vincent-zyu/koishi-plugin-dice-games101-3d-renderer)
