@@ -5,3 +5,10 @@
 *.ico -text
 *.gif -text
 *.webp -text
+
+# Include documentation and illustration scripts in GitHub Linguist statistics.
+*.py linguist-detectable=true
+*.md linguist-detectable=true
+*.MD linguist-detectable=true
+*.markdown linguist-detectable=true
+*.MARKDOWN linguist-detectable=true
