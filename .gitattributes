@@ -8,7 +8,12 @@
 
 # Include documentation and illustration scripts in GitHub Linguist statistics.
 *.py linguist-language=Python linguist-detectable -linguist-documentation -linguist-generated
-*.md linguist-language=Markdown linguist-detectable -linguist-documentation -linguist-generated
-*.MD linguist-language=Markdown linguist-detectable -linguist-documentation -linguist-generated
-*.markdown linguist-language=Markdown linguist-detectable -linguist-documentation -linguist-generated
-*.MARKDOWN linguist-language=Markdown linguist-detectable -linguist-documentation -linguist-generated
+
+# 📚 将所有 Markdown 与 README 纳入 GitHub Linguist 语言统计
+README.md linguist-language=Markdown linguist-detectable=true linguist-documentation=false
+readme.md linguist-language=Markdown linguist-detectable=true linguist-documentation=false
+*.md linguist-language=Markdown linguist-detectable=true linguist-documentation=false
+docs/**/*.md linguist-language=Markdown linguist-detectable=true linguist-documentation=false
+
+# ⚙️ 将配置文件本身纳入 GitHub Linguist 语言统计
+.gitattributes linguist-language=gitattributes linguist-detectable=true linguist-documentation=false -linguist-vendored -linguist-generated
