@@ -7,9 +7,22 @@ uv venv --python 3.13
 uv pip install matplotlib numpy
 ```
 
+## 准备字体（可选）
+
+绘图脚本优先使用 Koishi 共享数据目录中的 `LXGWWenKaiMono-Regular.ttf`。若未下载，可使用 00 脚本一键下载：
+
+```bash
+# 直连下载（Gitee 国内源）
+uv run 00_download_fonts.py
+
+# 使用代理下载（默认代理 http://127.0.0.1:7890）
+uv run 00_download_fonts.py --proxy
+```
+
 ## 生成所有图片
 
 ```bash
+uv run 00_download_fonts.py
 uv run 01_coordinate_system.py
 uv run 02_homogeneous_coords.py
 uv run 03_yaw_pitch_roll.py
