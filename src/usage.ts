@@ -12,23 +12,26 @@ export const usage = `
 
 <p>
   <a href="https://www.npmjs.com/package/koishi-plugin-dice-games101-3d-renderer" target="_blank">
-    <img src="https://img.shields.io/npm/v/koishi-plugin-dice-games101-3d-renderer?style=flat-square" alt="npm version">
+    <img src="https://img.shields.io/npm/v/koishi-plugin-dice-games101-3d-renderer?style=flat-square&logo=npm" alt="npm version">
   </a>
   <a href="https://npm-stat.com/charts.html?package=koishi-plugin-dice-games101-3d-renderer" target="_blank">
-    <img src="https://img.shields.io/npm/dm/koishi-plugin-dice-games101-3d-renderer?style=flat-square" alt="npm downloads">
+    <img src="https://img.shields.io/npm/dm/koishi-plugin-dice-games101-3d-renderer?style=flat-square&logo=npm" alt="npm downloads">
   </a>
+  <br>
   <a href="https://github.com/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer" target="_blank">
     <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
   </a>
   <a href="https://gitee.com/vincent-zyu/koishi-plugin-dice-games101-3d-renderer" target="_blank">
     <img src="https://img.shields.io/badge/Gitee-C71D23?style=for-the-badge&logo=gitee&logoColor=white" alt="Gitee">
   </a>
-  <a href="https://forum.koishi.xyz/t/topic/114514" target="_blank">
-    <img src="https://img.shields.io/badge/Koishi%20Forum-114514-5546A3?style=for-the-badge&logo=${KOISHI_LOGO_BASE64}&logoColor=white" alt="Koishi Forum">
+  <br>
+  <a href="https://forum.koishi.xyz/t/topic/12603" target="_blank">
+    <img src="https://img.shields.io/badge/Koishi%20Forum-12603-5546A3?style=for-the-badge&logo=${KOISHI_LOGO_BASE64}&logoColor=white" alt="Koishi Forum">
   </a>
-  <a href="https://qm.qq.com/q/4vjto4V7Di" target="_blank">
+  <a href="https://qm.qq.com/q/ZHj33L5cuC" target="_blank">
     <img src="https://img.shields.io/badge/QQ群-1085190201-12B7F5?style=flat-square&logo=qq&logoColor=white" alt="QQ群">
   </a>
+  <br>
   <a href="https://opensource.org/licenses/MIT" target="_blank">
     <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License">
   </a>
@@ -36,6 +39,12 @@ export const usage = `
     <img src="https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
   </a>
 </p>
+
+<h2>💬 交流反馈</h2>
+<p>🐛 Bug 反馈 / 💡 建议 / 👨‍💻 插件开发交流，欢迎加群：</p>
+<p><del>💬 插件使用问题 / 🐛 Bug反馈 / 👨‍💻 插件开发交流，欢迎加入QQ群：<b>259248174</b>   🎉（这个群G了）</del></p> 
+<p>💬 插件使用问题 / 🐛 Bug反馈 / 👨‍💻 插件开发交流，欢迎加入QQ群：<b>1085190201</b> 🎉</p>
+<p>💡 在群里直接艾特我，回复的更快哦~ ✨</p>
 
 <blockquote style="margin: 14px 0; padding: 12px 16px; border-left: 6px solid #ff6600; border-radius: 8px; background: rgba(255, 102, 0, 0.12); color: inherit; line-height: 1.6; box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
   <b style="color: #ff6600; font-size: 16px;">🎲 零图形库依赖的纯手写 3D 软件渲染引擎</b><br>
