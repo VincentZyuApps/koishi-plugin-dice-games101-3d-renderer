@@ -46,13 +46,13 @@ dice -a --kd 0.5 --ks 0     # 坐标轴 + 纯 Lambert 漫反射（无高光）
 ## 📸 预览
 
 ### dice 指令效果
-![dice 渲染效果](doc/images/preview/preview.dice.png)
+![dice 渲染效果](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/preview/preview.dice.png)
 
 ### OneBot 平台 / 普通消息模式
-![OneBot 平台](doc/images/preview/preview.command.dice.onebot.platform.png)
+![OneBot 平台](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/preview/preview.command.dice.onebot.platform.png)
 
 ### QQ 官方平台 / Markdown + LaTeX 模式
-![QQ 官方 Markdown](doc/images/preview/preview.command.dice.onebot.qq.platform.markdown.latex.png)
+![QQ 官方 Markdown](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/preview/preview.command.dice.onebot.qq.platform.markdown.latex.png)
 
 ---
 
@@ -157,7 +157,7 @@ flowchart TD
 - **摄像头** 站在 `(0, 0, 3)`，看向 `(0, 0, 0)` → 视线是 **-Z**
 - **Up 方向** 是 **+Y**，**右侧** 是 **+X**
 
-![坐标系示意图](doc/images/01_coordinate_system.png)
+![坐标系示意图](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/01_coordinate_system.png)
 
 ---
 
@@ -175,7 +175,7 @@ $$
 
 > 规定：$w=1$ 表示点（位置），$w=0$ 表示向量（方向，不受平移影响）。
 
-![齐次坐标示意图](doc/images/02_homogeneous_coords.png)
+![齐次坐标示意图](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/02_homogeneous_coords.png)
 
 ---
 
@@ -204,7 +204,7 @@ const yw = yaw ?? lcg(seed) % 360
 
 > LCG（线性同余生成器）是最简单的伪随机数算法，公式 $x_{n+1}=(ax_n+c)\mod m$，这里 $a=1664525$，$c=1013904223$，$m=2^{32}$。
 
-![Yaw / Pitch / Roll 三轴旋转](doc/images/03_yaw_pitch_roll.png)
+![Yaw / Pitch / Roll 三轴旋转](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/03_yaw_pitch_roll.png)
 
 ---
 
@@ -212,7 +212,7 @@ const yw = yaw ?? lcg(seed) % 360
 
 所有顶点依次经过三个变换：**Model → View → Projection**。
 
-![MVP 变换四阶段](doc/images/04_mvp_stages.png)
+![MVP 变换四阶段](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/04_mvp_stages.png)
 
 ### Model 矩阵：三轴旋转
 
@@ -330,7 +330,7 @@ $$
 const proj = Mat4.perspective(45, 1, 0.1, 100)
 ```
 
-![透视投影视锥体](doc/images/05_perspective_projection.png)
+![透视投影视锥体](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/05_perspective_projection.png)
 
 ---
 
@@ -350,7 +350,7 @@ $$
 x_s=\frac{x_{\text{NDC}}+1}{2}\cdot W,\qquad y_s=\frac{1-y_{\text{NDC}}}{2}\cdot H
 $$
 
-![透视除法与视口变换](doc/images/06_viewport_transform.png)
+![透视除法与视口变换](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/06_viewport_transform.png)
 
 ---
 
@@ -383,7 +383,7 @@ $$
 
 遍历策略：取包围盒（AABB）内所有像素，用边缘函数快速跳过外点，避免逐像素遍历全图。
 
-![光栅化：AABB 包围盒 + 重心坐标](doc/images/07_rasterization.png)
+![光栅化：AABB 包围盒 + 重心坐标](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/07_rasterization.png)
 
 ### 透视校正插值
 
@@ -413,7 +413,7 @@ $$
 f_P=\frac{\alpha\,\dfrac{f_0}{w_0}+\beta\,\dfrac{f_1}{w_1}+\gamma\,\dfrac{f_2}{w_2}}{\alpha\,\dfrac{1}{w_0}+\beta\,\dfrac{1}{w_1}+\gamma\,\dfrac{1}{w_2}}
 $$
 
-![透视校正插值 vs 线性插值](doc/images/08_perspective_correction.png)
+![透视校正插值 vs 线性插值](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/08_perspective_correction.png)
 
 ### Z-buffer 深度测试
 
@@ -428,7 +428,7 @@ if (zInterp < depthBuffer[x][y]) {
 }
 ```
 
-![Z-buffer 深度测试](doc/images/09_zbuffer.png)
+![Z-buffer 深度测试](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/09_zbuffer.png)
 
 ---
 
@@ -456,7 +456,7 @@ const diff = Math.max(0, normal.dot(lightDir))
 const color = baseColor * (0.15 + diff * 0.85)
 ```
 
-![Lambert 漫反射光照模型](doc/images/10_lambert_lighting.png)
+![Lambert 漫反射光照模型](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/10_lambert_lighting.png)
 
 ### 扩展：完整 [Blinn-Phong 模型](https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model)
 
@@ -497,7 +497,7 @@ Eigen::Vector3f Ld = kd.cwiseProduct(I_r2) * max(0, n.dot(l_dir));   // 漫反�
 Eigen::Vector3f Ls = ks.cwiseProduct(I_r2) * pow(max(0, n.dot(h)), p); // 高光
 ```
 
-![完整 Blinn-Phong 模型](doc/images/11_blinn_phong.png)
+![完整 Blinn-Phong 模型](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/11_blinn_phong.png)
 
 ### 法线变换矩阵：为什么用 $(M^{-1})^T$？
 
@@ -513,7 +513,7 @@ $$
 
 对纯旋转矩阵 $M=R$，由 $R^{-1}=R^T$ 可得 $G=R$，退化为直接用 $M$。本项目骰子只做旋转无缩放，所以法线可以直接经过 Model 矩阵旋转部分变换。
 
-![法线变换矩阵 (M⁻¹)ᵀ](doc/images/12_normal_matrix.png)
+![法线变换矩阵 (M⁻¹)ᵀ](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/12_normal_matrix.png)
 
 ### 点数判断（UV 圆形测试）
 
@@ -527,7 +527,7 @@ $$
 const isDot = (uv.x - dotCenter.x) ** 2 + (uv.y - dotCenter.y) ** 2 < 0.09 ** 2
 ```
 
-![骰子六面点数 UV 布局](doc/images/13_uv_dots.png)
+![骰子六面点数 UV 布局](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/13_uv_dots.png)
 
 ---
 
@@ -570,7 +570,7 @@ export function getTopFace(model: Mat4): number {
 }
 ```
 
-![顶面判断算法](doc/images/14_top_face.png)
+![顶面判断算法](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-dice-games101-3d-renderer@main/doc/images/14_top_face.png)
 
 ---
 ---
